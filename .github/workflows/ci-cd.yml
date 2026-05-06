@@ -28,10 +28,12 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      - name: Backend - lint (if configured)
+      - name: Backend - lint
         working-directory: backend
-        run: |
-          npm run lint || echo "No backend lint script configured"
+        run: npm run lint || echo "No backend lint script configured"
+
+
+
 
       - name: Backend - npm audit
         working-directory: backend
@@ -41,18 +43,17 @@ jobs:
         working-directory: backend
         run: npm test -- --runInBand
 
-      - name: Backend - Snyk scan (requires SNYK_TOKEN)
-        if: ${{ secrets.SNYK_TOKEN != '' }}
-        uses: snyk/actions/node@master
+      - name: Backend - Snyk scan
+        working-directory: backend
+        run: npx snyk test --severity-threshold=high || true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-          args: --severity-threshold=high
 
-      - name: Backend - Snyk scan skipped (no SNYK_TOKEN)
-        if: ${{ secrets.SNYK_TOKEN == '' }}
-        run: echo "SNYK_TOKEN non défini => scan Snyk ignoré"
+
+
+
+
+
 
       # Frontend checks
       - name: Frontend - npm ci
@@ -67,18 +68,14 @@ jobs:
         working-directory: frontend
         run: npm audit --audit-level=high || true
 
-      - name: Frontend - Snyk scan (requires SNYK_TOKEN)
-        if: ${{ secrets.SNYK_TOKEN != '' }}
-        uses: snyk/actions/node@master
+      - name: Frontend - Snyk scan
+        working-directory: frontend
+        run: npx snyk test --severity-threshold=high || true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-          args: --severity-threshold=high
 
-      - name: Frontend - Snyk scan skipped (no SNYK_TOKEN)
-        if: ${{ secrets.SNYK_TOKEN == '' }}
-        run: echo "SNYK_TOKEN non défini => scan Snyk ignoré"
+
+
 
       - name: Frontend - tests
         working-directory: frontend
