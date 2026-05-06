@@ -44,12 +44,13 @@ jobs:
         run: npm test -- --runInBand
 
       - name: Backend - Snyk scan
-        uses: snyk/actions/node@master
+        working-directory: backend
+        run: npx snyk test --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-          args: --severity-threshold=high
+
+
+
 
 
       # Frontend checks
@@ -66,12 +67,11 @@ jobs:
         run: npm audit --audit-level=high || true
 
       - name: Frontend - Snyk scan
-        uses: snyk/actions/node@master
+        working-directory: frontend
+        run: npx snyk test --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-          args: --severity-threshold=high
+
 
 
       - name: Frontend - tests
